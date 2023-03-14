@@ -1,0 +1,98 @@
+#To run this code you first need to install ursina into your pc.To do that you can opend command prompt on your pc and run the following code 'pip install ursina'.
+
+from ursina import *
+import random
+import turtle
+
+
+app = Ursina()
+window.fullscreen = True
+def command():    
+    destroy(button)
+    mouse.visible = False
+    for i in range(11):
+        for j in range(1000):
+            entity = Entity(model = 'cube',scale = (1, 1, 1), ignore = True, color = color.green, parent = scene, position = (i, 0, j), origin_y = 0.5, texture = 'brick')
+
+def win():
+    wn = turtle.Screen()
+    wn.setup(width = 1.0, height = 1.0)
+    wn.title('Congratulations!')
+    turtle.bgcolor('black')
+    turtle.color('white')
+    turtle.hideturtle()
+    turtle.penup()
+    turtle.goto(-150, 0)
+    turtle.pendown()
+    turtle.write('You win!', font = ("Arial", int(50), "bold"))
+    time.sleep(5)
+
+def lose():
+    wn = turtle.Screen()
+    wn.setup(width = 1.0, height = 1.0)
+    wn.title('Sorry!')
+    turtle.bgcolor('black')
+    turtle.color('white')
+    turtle.hideturtle()
+    turtle.penup()
+    turtle.goto(-200, 0)
+    turtle.pendown()
+    turtle.write('You lost!', font = ("Arial", int(50), "bold"))
+    time.sleep(5)
+
+cube = Entity(model = 'cube', color = color.blue, texture = 'white_cube', collider = 'box', scale = (1, 1, 1))
+cube.y = 0.4
+cube.position = (0, 0.5, 1)
+camera.position = (cube.x, 1.5, -30)
+for i in range(1000):
+    random_number = random.randint(0, 10)
+    random_number2 = random.randint(10, 1000)
+    ran_x = cube.x + random_number
+    ran_z = cube.z + random_number2
+    box = Entity(model = 'cube', scale = (1, 2, 1), texture = 'white_cube', color = color.red, ignore = True, origin_y = 0)
+    box.position = (ran_x, 1.2, ran_z)
+    collider = Entity(model = 'cube',collider = 'box', texture = 'white_cube', color = color.red, scale = (0.8, 2))
+    collider.position = (ran_x, 1.2, ran_z)
+def update():
+    hit_info = cube.intersects()
+    cube.z += 0.1
+    camera.z += 0.1
+    if hit_info.hit:
+        cube.z -= 0.1
+    if camera.z > cube.z + 10:
+        print('You have lost!')
+        lose()
+        quit()
+    elif cube.z > 1000:
+        print('You win!')
+        win()
+        quit()
+    if cube.x < 0:
+        cube.x += 1
+        camera.x += 1
+    if cube.x > 10:
+        cube.x -= 1
+        camera.x -= 1
+def input(key):
+        if key=='right arrow':
+            cube.x += 1
+            camera.x += 1
+        elif key=='left arrow':
+            cube.x -= 1
+            camera.x -= 1
+        if key=='1':
+            camera.position = (cube.x, 40, cube.z)
+            camera.rotation = Vec3(90, 0, 0)
+        elif key=='2':
+            camera.position = (cube.x - 40, 0, cube.z)
+            camera.rotation = Vec3(0, 90, 0)
+        elif key=='3':
+            camera.position = (cube.x + 40, 0, cube.z)
+            camera.rotation = Vec3(0, -90, 0)
+        elif key=='4':
+            camera.position = (cube.x, 2, cube.z - 20)
+            camera.rotation = Vec3(0, 0, 0)
+button = Button(text = 'Start',color = color.blue, text_color = color.orange, scale = 0.1, icon = 'sword', text_origin = (0.1, 0, 0))
+button.on_click = command
+button.tooltip = Tooltip('Start!')
+app.run()
